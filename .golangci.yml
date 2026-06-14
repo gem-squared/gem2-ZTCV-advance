@@ -1,0 +1,35 @@
+# golangci-lint v2 config — minimum-but-strict lint posture for ZTCV.
+# Enabled linters chosen per WP-01.U7 contract: errcheck, govet,
+# ineffassign, staticcheck (defaults plus an explicit list for clarity).
+version: "2"
+
+run:
+  timeout: 5m
+  tests: true
+
+linters:
+  default: none
+  enable:
+    - errcheck      # unchecked errors
+    - govet         # vet
+    - ineffassign   # ineffectual assignments
+    - staticcheck   # static analysis
+    - unused        # unused symbols (was previously bundled in staticcheck)
+  exclusions:
+    paths:
+      - data
+      - frontend
+      - contracts
+    rules:
+      # Tests sometimes intentionally swallow errors; allow it.
+      - linters: [errcheck]
+        path: _test\.go
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0

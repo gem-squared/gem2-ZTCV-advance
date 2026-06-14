@@ -1,0 +1,19 @@
+{
+  "passport": {
+    "sessionId": "sess_demo_1_static",
+    "issuedAt": "2026-05-27T00:00:00Z",
+    "expiresAt": "2026-05-27T00:05:00Z",
+    "outcome": "SAFE",
+    "stamps": [
+      { "label": "기관 DID", "status": "OK", "detail": "did:opendid:agent:kakaobank-ai-loan-counselor-001" },
+      { "label": "AI Agent 권한", "status": "OK", "detail": "purpose=loan_consultation 권한 확인" },
+      { "label": "수신자 Mobile ID", "status": "OK", "detail": "OmniOne CX (mock) — 수신자 Mobile ID 검증 완료" },
+      { "label": "Chain Receipt", "status": "OK", "detail": "0xMOCKc24a456fb368075cdd365b5337db4b143c2a34c23fc7659191cc8c95b40" }
+    ],
+    "receiptTxHash": "0xMOCKc24a456fb368075cdd365b5337db4b143c2a34c23fc7659191cc8c95b40",
+    "explorerUrl": "https://sepolia.etherscan.io/tx/0xMOCKc24a456fb368075cdd365b5337db4b143c2a34c23fc7659191cc8c95b40",
+    "callerDid": "did:opendid:agent:kakaobank-ai-loan-counselor-001",
+    "callerOrg": "카카오뱅크",
+    "callerPurpose": "loan_consultation"
+  }
+}

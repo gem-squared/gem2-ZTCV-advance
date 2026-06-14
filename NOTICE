@@ -1,0 +1,44 @@
+VOUCH — Verified Outgoing-call Universal Compliance Hub
+=========================================================
+
+Copyright 2026 David Seo · GEM² (gemsquared.ai / Gineers.ai)
+Contact: david@gemsquared.ai
+
+Origin
+------
+The VOUCH protocol concept — pre-call mutual identity verification using
+Mobile ID, OmniOne Open DID, OmniOne Chain, and AI intent disclosure —
+was conceived and architected by David Seo in May 2026 and first submitted
+as a hackathon proposal on 2026-05-31.
+
+This repository (github.com/gem-squared/gem2-ZTCV-advance) is the
+authoritative public origin of the VOUCH protocol specification and its
+reference Go implementation.
+
+Attribution Requirement
+-----------------------
+This work is licensed under CC BY 4.0. Any reuse, adaptation, or
+derivative work must include the following attribution:
+
+  "Based on VOUCH by David Seo · GEM² (gemsquared.ai),
+   https://github.com/gem-squared/gem2-ZTCV-advance"
+
+Third-Party Components
+----------------------
+This project incorporates the following open-source components:
+
+  Go standard library and modules — BSD-style / MIT / Apache 2.0
+  (see go.mod and go.sum for full dependency list)
+
+  ethers.js / Hardhat — MIT
+  (see contracts/package.json)
+
+  React / Vite / Tailwind CSS — MIT
+  (see frontend-d/pwa/package.json)
+
+  OmniOne Open DID / OmniOne CX / OmniOne Chain are products of
+  Raonsecure Inc. This project integrates with their published APIs.
+  No OmniOne source code is included in this repository.
+
+  Anthropic Claude API is used for AI intent analysis (Intent Handshake).
+  No Anthropic model weights or proprietary code are included.

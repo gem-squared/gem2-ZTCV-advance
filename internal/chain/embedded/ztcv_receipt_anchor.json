@@ -1,0 +1,183 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "ZTCVReceiptAnchor",
+  "sourceName": "contracts/ZTCVReceiptAnchor.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "sessionHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "ReceiptAlreadyAnchored",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "sessionHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "ReceiptNotFound",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "sessionHash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "receiptHash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "isSafe",
+          "type": "bool"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "policyVersion",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "ReceiptAnchored",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "_sessionHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getReceipt",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "bytes32",
+              "name": "sessionHash",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "receiptHash",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "uint256",
+              "name": "timestamp",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bool",
+              "name": "isSafe",
+              "type": "bool"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "policyVersion",
+              "type": "bytes32"
+            }
+          ],
+          "internalType": "struct ZTCVReceiptAnchor.CallReceipt",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "_sessionHash",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "_receiptHash",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bool",
+          "name": "_isSafe",
+          "type": "bool"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "_policyVersion",
+          "type": "bytes32"
+        }
+      ],
+      "name": "recordVerification",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "name": "registry",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "sessionHash",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "receiptHash",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "isSafe",
+          "type": "bool"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "policyVersion",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x6080604052348015600f57600080fd5b506103408061001f6000396000f3fe608060405234801561001057600080fd5b50600436106100415760003560e01c80635c4c9c7e146100465780637ef502981461005b578063fcecbb61146100ca575b600080fd5b6100596100543660046102ad565b610121565b005b61009b6100693660046102f1565b6000602081905290815260409020805460018201546002830154600384015460049094015492939192909160ff169085565b6040805195865260208601949094529284019190915215156060830152608082015260a0015b60405180910390f35b6100dd6100d83660046102f1565b61020f565b6040516100c19190600060a0820190508251825260208301516020830152604083015160408301526060830151151560608301526080830151608083015292915050565b6000848152602081905260409020600201541561015957604051634a9f520760e11b8152600481018590526024015b60405180910390fd5b6040805160a081018252858152602080820186815242838501818152871515606080870182815260808089018b815260008f8152808a528b902099518a55965160018a0155935160028901555160038801805460ff1916911515919091179055935160049096019590955585518981529384019490945293820185905281019290925285917f626e74beab74a1f94816bdecf3386a85395c123a0ac6e3fe4aa7aca22db3148e910160405180910390a250505050565b6040805160a081018252600080825260208201819052918101829052606081018290526080810191909152600082815260208181526040808320815160a081018352815481526001820154938101939093526002810154918301829052600381015460ff16151560608401526004015460808301529091036102a75760405163e69f2ea160e01b815260048101849052602401610150565b92915050565b600080600080608085870312156102c357600080fd5b8435935060208501359250604085013580151581146102e157600080fd5b9396929550929360600135925050565b60006020828403121561030357600080fd5b503591905056fea264697066735822122057dfa5f85736d31583c6d3ea78a1fb535a78cf2354c166e16d7e37f9581459e764736f6c634300081b0033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100415760003560e01c80635c4c9c7e146100465780637ef502981461005b578063fcecbb61146100ca575b600080fd5b6100596100543660046102ad565b610121565b005b61009b6100693660046102f1565b6000602081905290815260409020805460018201546002830154600384015460049094015492939192909160ff169085565b6040805195865260208601949094529284019190915215156060830152608082015260a0015b60405180910390f35b6100dd6100d83660046102f1565b61020f565b6040516100c19190600060a0820190508251825260208301516020830152604083015160408301526060830151151560608301526080830151608083015292915050565b6000848152602081905260409020600201541561015957604051634a9f520760e11b8152600481018590526024015b60405180910390fd5b6040805160a081018252858152602080820186815242838501818152871515606080870182815260808089018b815260008f8152808a528b902099518a55965160018a0155935160028901555160038801805460ff1916911515919091179055935160049096019590955585518981529384019490945293820185905281019290925285917f626e74beab74a1f94816bdecf3386a85395c123a0ac6e3fe4aa7aca22db3148e910160405180910390a250505050565b6040805160a081018252600080825260208201819052918101829052606081018290526080810191909152600082815260208181526040808320815160a081018352815481526001820154938101939093526002810154918301829052600381015460ff16151560608401526004015460808301529091036102a75760405163e69f2ea160e01b815260048101849052602401610150565b92915050565b600080600080608085870312156102c357600080fd5b8435935060208501359250604085013580151581146102e157600080fd5b9396929550929360600135925050565b60006020828403121561030357600080fd5b503591905056fea264697066735822122057dfa5f85736d31583c6d3ea78a1fb535a78cf2354c166e16d7e37f9581459e764736f6c634300081b0033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

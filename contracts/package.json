@@ -1,0 +1,23 @@
+{
+  "name": "ztcv-contracts",
+  "version": "0.0.1",
+  "private": true,
+  "description": "ZTCV — ZTCVReceiptAnchor.sol + Hardhat tooling for testnet anchor (Sepolia / OmniOne)",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "node": "hardhat node",
+    "generate-wallet": "ts-node scripts/generate-wallet.ts",
+    "deploy:sepolia": "hardhat run scripts/deploy.ts --network sepolia",
+    "deploy:local": "hardhat run scripts/deploy.ts --network localhost",
+    "extract-abi": "bash scripts/extract-abi.sh"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@types/node": "^22.10.5",
+    "dotenv": "^16.4.7",
+    "hardhat": "^2.22.19",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
+  }
+}

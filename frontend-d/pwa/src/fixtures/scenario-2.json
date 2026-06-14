@@ -1,0 +1,16 @@
+{
+  "passport": {
+    "sessionId": "sess_demo_2_static",
+    "issuedAt": "2026-05-27T00:00:00Z",
+    "expiresAt": "2026-05-27T00:05:00Z",
+    "outcome": "FAILED",
+    "stamps": [
+      { "label": "발신자 DID 없음", "status": "FAIL", "detail": "발신자 DID 미등록 — 신원 확인 불가" },
+      { "label": "송금 요구 감지", "status": "FAIL", "detail": "송금/안전계좌 패턴 감지" },
+      { "label": "차단 영수증 기록", "status": "OK", "detail": "0xMOCKdb719f7653939a15d109807ae117419846e240467355925db63f89e9192" }
+    ],
+    "blockReason": "unknown_did",
+    "receiptTxHash": "0xMOCKdb719f7653939a15d109807ae117419846e240467355925db63f89e9192",
+    "explorerUrl": "https://sepolia.etherscan.io/tx/0xMOCKdb719f7653939a15d109807ae117419846e240467355925db63f89e9192"
+  }
+}

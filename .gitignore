@@ -1,0 +1,78 @@
+# gem2-ZTCV-advance — public source repository.
+# Keys, tokens, internal docs, and confidential data are excluded.
+
+# Binaries
+*.exe
+*.dll
+*.so
+*.dylib
+/cmd/*/[a-z]*
+!/cmd/*/main.go
+!/cmd/*/*.go
+
+.claude/
+.claude/*
+.gem-squared/
+.gem-squared/*
+
+# Environment — keys, tokens, secrets stay LOCAL only
+.env
+.env.local
+.env.example
+
+*.local
+
+CLAUDE.md
+
+docker-compose.yaml
+Dockerfile
+Dockerfile.chainsim
+
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Go
+vendor/
+
+# Node
+node_modules/
+.next/
+out/
+dist/
+build/
+.vite/
+
+# Temp
+tmp/
+temp/
+
+# SQLite — per-service local DBs
+data/*.db
+data/*.db-journal
+data/*.db-wal
+data/*.db-shm
+
+# Hardhat — regenerable build artifacts
+contracts/artifacts/
+contracts/cache/
+contracts/typechain-types/
+docs-internal/
+docs-internal/*
+team-work/
+team-work/*
+submission/
+submission/*
+Confidential-data/
+Confidential-data/*
+
+제출서류/
+제출서류/*

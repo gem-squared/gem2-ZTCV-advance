@@ -1,0 +1,19 @@
+{
+  "passport": {
+    "sessionId": "sess_demo_3_static",
+    "issuedAt": "2026-05-27T00:00:00Z",
+    "expiresAt": "2026-05-27T00:05:00Z",
+    "outcome": "FAILED",
+    "stamps": [
+      { "label": "기관 DID", "status": "OK", "detail": "기관 DID 확인" },
+      { "label": "AI Agent 권한 (권한 외 목적)", "status": "FAIL", "detail": "권한 외 목적" },
+      { "label": "차단 영수증 기록", "status": "OK", "detail": "0xMOCKf58e98e692632aaaded8e98965421afd88c6771fa29b1e21b8ab10e9ff0" }
+    ],
+    "blockReason": "unauthorized_purpose",
+    "receiptTxHash": "0xMOCKf58e98e692632aaaded8e98965421afd88c6771fa29b1e21b8ab10e9ff0",
+    "explorerUrl": "https://sepolia.etherscan.io/tx/0xMOCKf58e98e692632aaaded8e98965421afd88c6771fa29b1e21b8ab10e9ff0",
+    "callerDid": "did:opendid:agent:kakaobank-ai-security-alert-007",
+    "callerOrg": "카카오뱅크",
+    "callerPurpose": "loan_consultation"
+  }
+}

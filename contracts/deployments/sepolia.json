@@ -1,0 +1,8 @@
+{
+  "network": "sepolia",
+  "address": "0x70fc086A3f4e91dA3f7e3Aeb4D2C806DdF3dED04",
+  "deployTxHash": "0x30e4ab5bc505e3a9024204a360501b2179eef9a4b6684faad7497e4488bb9817",
+  "chainId": 11155111,
+  "deployedAt": "2026-05-27T07:14:37.408Z",
+  "contractName": "ZTCVReceiptAnchor"
+}

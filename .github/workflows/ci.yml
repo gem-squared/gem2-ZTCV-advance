@@ -1,0 +1,190 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ────────────────────────────────────────────────────────────────────
+  # Go: build + test + vet + gofmt (always runs)
+  # ────────────────────────────────────────────────────────────────────
+  go:
+    name: Go build / test / vet / fmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+          cache: true
+
+      - name: go mod tidy (verify go.sum)
+        run: |
+          go mod tidy
+          if ! git diff --quiet go.mod go.sum; then
+            echo "go.mod/go.sum out of sync. Run 'go mod tidy' locally."
+            git diff go.mod go.sum
+            exit 1
+          fi
+
+      - name: gofmt -d
+        run: |
+          DIFF=$(gofmt -d .)
+          if [ -n "$DIFF" ]; then
+            echo "gofmt diff (run 'gofmt -w .' locally):"
+            echo "$DIFF"
+            exit 1
+          fi
+
+      - name: go vet
+        run: go vet ./...
+
+      - name: go build
+        run: go build ./...
+
+      - name: go test
+        run: go test -race -count=1 ./...
+
+  # ────────────────────────────────────────────────────────────────────
+  # golangci-lint (always runs; uses .golangci.yml)
+  # ────────────────────────────────────────────────────────────────────
+  lint:
+    name: golangci-lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+          cache: true
+      # v8 ships golangci-lint v2.x (built with Go 1.25), which our
+      # go.mod 1.25.5 requires. v6 shipped v1.64.8 built with Go 1.24
+      # and failed with "Go language version (go1.24) ... lower than
+      # the targeted Go version (1.25.5)".
+      - uses: golangci/golangci-lint-action@v8
+        with:
+          version: latest
+          args: --timeout=5m
+
+  # ────────────────────────────────────────────────────────────────────
+  # Frontend: lint + build (only if frontend/pwa/package.json exists)
+  # Moafik's Phase 1 PWA work creates package.json; this job lights up
+  # automatically once that lands.
+  # ────────────────────────────────────────────────────────────────────
+  frontend:
+    name: Frontend lint + build (conditional)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for frontend/pwa/package.json
+        id: probe
+        run: |
+          if [ -f frontend/pwa/package.json ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "frontend/pwa/package.json not present yet — skipping (Moafik Phase 1 will add it)"
+          fi
+
+      - name: Set up Node
+        if: steps.probe.outputs.exists == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: frontend/pwa/package-lock.json
+
+      - name: npm ci
+        if: steps.probe.outputs.exists == 'true'
+        working-directory: frontend/pwa
+        run: npm ci
+
+      - name: npm run lint
+        if: steps.probe.outputs.exists == 'true'
+        working-directory: frontend/pwa
+        run: npm run lint --if-present
+
+      - name: npm run build
+        if: steps.probe.outputs.exists == 'true'
+        working-directory: frontend/pwa
+        run: npm run build
+
+  # ────────────────────────────────────────────────────────────────────
+  # Contracts: hardhat compile (only if contracts/package.json exists)
+  # WP-03.U4 will add the real contracts/ scaffold; this job lights up
+  # automatically when that lands.
+  # ────────────────────────────────────────────────────────────────────
+  contracts:
+    name: Hardhat compile (conditional)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for contracts/package.json
+        id: probe
+        run: |
+          if [ -f contracts/package.json ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "contracts/package.json not present yet — skipping (WP-03.U4 will add it)"
+          fi
+
+      - name: Set up Node
+        if: steps.probe.outputs.exists == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: contracts/package-lock.json
+
+      - name: npm ci
+        if: steps.probe.outputs.exists == 'true'
+        working-directory: contracts
+        run: npm ci
+
+      - name: npx hardhat compile
+        if: steps.probe.outputs.exists == 'true'
+        working-directory: contracts
+        run: npx hardhat compile
+
+  # ────────────────────────────────────────────────────────────────────
+  # Docker build smoke — only runs when Dockerfile is present.
+  # Dockerfile is excluded from the public tree; this job is a no-op
+  # unless a Dockerfile is added back.
+  # ────────────────────────────────────────────────────────────────────
+  docker:
+    name: Docker build smoke (session-svc, conditional)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for Dockerfile
+        id: probe
+        run: |
+          if [ -f Dockerfile ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "Dockerfile not present — skipping docker build smoke"
+          fi
+
+      - uses: docker/setup-buildx-action@v3
+        if: steps.probe.outputs.exists == 'true'
+
+      - name: Build session-svc image
+        if: steps.probe.outputs.exists == 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile
+          push: false
+          build-args: SERVICE=session-svc
+          tags: ztcv/session-svc:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
