@@ -2,6 +2,7 @@ import type { ScenariosRunResponse } from './types/passport'
 import scenario1Fixture from './fixtures/scenario-1.json'
 import scenario2Fixture from './fixtures/scenario-2.json'
 import scenario3Fixture from './fixtures/scenario-3.json'
+import { BYO_KEY_STORAGE } from './components/BYOKeyModal'
 
 // BACKEND_URL: defaults to production sim-mode. Override via .env.local
 // VITE_BACKEND_URL=http://localhost:8001 to point at our local Sepolia-anchoring
@@ -22,6 +23,11 @@ export interface RunScenarioResult {
   source: 'live' | 'fixture'
 }
 
+function byoHeaders(): HeadersInit {
+  const key = sessionStorage.getItem(BYO_KEY_STORAGE)
+  return key ? { 'X-LLM-API-Key': key } : {}
+}
+
 // Broken demo is fatal — runScenario MUST always resolve with a usable result.
 // Network/timeout/non-2xx all fall back to committed fixture silently; the
 // returned `source` flag drives an "오프라인 모드" pill in the UI.
@@ -33,6 +39,7 @@ export async function runScenario(n: 1 | 2 | 3): Promise<RunScenarioResult> {
   try {
     const res = await fetch(`${BACKEND_URL}/api/scenarios/run?n=${n}`, {
       method: 'POST',
+      headers: byoHeaders(),
       signal: controller.signal
     })
     clearTimeout(timer)

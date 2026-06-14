@@ -14,6 +14,7 @@ import { BrokerPanel, type BrokerPhase } from '../panels/BrokerPanel'
 import { ReceiverPanel, type ReceiverPhase } from '../panels/ReceiverPanel'
 import { SCENARIO_LIST, type ScenarioId, type BadgeTone } from '../scenarios'
 import { runScenario, type RunScenarioResult } from '../api'
+import { BYOKeyModal, BYO_KEY_STORAGE } from '../components/BYOKeyModal'
 import { SvgOverlay } from '../flow/SvgOverlay'
 import { FlowLine } from '../flow/FlowLine'
 import { FlowLabel } from '../flow/FlowLabel'
@@ -63,6 +64,10 @@ export function FlowPage() {
   const [flow, setFlow] = useState<FlowState>(FLOW_INIT)
   const [anchorVersion, setAnchorVersion] = useState(0)
   const [auditOpen, setAuditOpen] = useState(false)
+  const [showKeyModal, setShowKeyModal] = useState(
+    () => !sessionStorage.getItem(BYO_KEY_STORAGE)
+  )
+  const hasKey = !!sessionStorage.getItem(BYO_KEY_STORAGE)
 
   const callerRef   = useRef<HTMLDivElement | null>(null)
   const brokerRef   = useRef<HTMLDivElement | null>(null)
@@ -171,6 +176,9 @@ export function FlowPage() {
 
   return (
     <div className="min-h-screen w-full bg-black text-zinc-100 relative overflow-x-hidden">
+      {showKeyModal && (
+        <BYOKeyModal onClose={() => setShowKeyModal(false)} />
+      )}
       {/* Header strip — brand + status pills + Replay only (scenario picker moved
           to left column below Caller per WP-07.1) */}
       <header className="px-6 py-4 border-b border-zinc-900/80 relative z-20 bg-black/80 backdrop-blur-sm">
@@ -238,6 +246,13 @@ export function FlowPage() {
               )}
             </button>
           </div>
+          <button
+            onClick={() => setShowKeyModal(true)}
+            title={hasKey ? 'API key set — click to change' : 'Set Anthropic API key for live AI'}
+            className={`px-3 py-1.5 text-xs rounded-lg transition-colors ${hasKey ? 'bg-fuchsia-950/40 border border-fuchsia-800/60 text-fuchsia-300 hover:bg-fuchsia-900/40' : 'bg-zinc-900 border border-zinc-700 text-zinc-400 hover:bg-zinc-800'}`}
+          >
+            🔑 {hasKey ? 'API Key ✓' : 'API Key'}
+          </button>
           <button
             onClick={replay}
             disabled={!scenarioId}

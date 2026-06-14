@@ -220,7 +220,7 @@ func (s *Service) handleGetPassport(w http.ResponseWriter, r *http.Request, id s
 		return
 	}
 	trace, _ := s.Repo.LoadTrace(id)
-	manifest, manifestHash := s.runIntentHandshake(r.Context(), sess)
+	manifest, manifestHash := s.runIntentHandshakeWith(r.Context(), sess, s.intentForRequest(r))
 	cp := passport.Build(passport.Input{
 		Session:            sess,
 		Trace:              trace,
@@ -234,14 +234,29 @@ func (s *Service) handleGetPassport(w http.ResponseWriter, r *http.Request, id s
 	server.WriteJSON(w, http.StatusOK, cp)
 }
 
-// runIntentHandshake executes Step 7 of the 9-step pipeline. Always
-// returns a usable (manifest, hash) pair — the manifest's Source field
-// distinguishes "live" (LLM call succeeded) from "fallback"
-// (deterministic per-scenario script). Never returns an error so a
-// caller can ignore failure modes; the demo never breaks on LLM
-// unavailability.
-func (s *Service) runIntentHandshake(ctx context.Context, sess *types.CallSession) (*types.IntentManifest, string) {
-	if s.Intent == nil || sess == nil {
+// intentForRequest returns a per-request Generator built from the
+// X-LLM-API-Key header (BYO key). Falls back to the service-level
+// generator (which may be noop) when the header is absent or empty.
+// The caller's key is used only for this request and is never stored.
+func (s *Service) intentForRequest(r *http.Request) intent.Generator {
+	key := strings.TrimSpace(r.Header.Get("X-LLM-API-Key"))
+	if key == "" {
+		return s.Intent
+	}
+	client := llm.NewAnthropic(llm.AnthropicConfig{ApiKey: key})
+	if client == nil {
+		return s.Intent
+	}
+	return intent.New(client)
+}
+
+// runIntentHandshakeWith executes Step 7 using the supplied Generator.
+// Always returns a usable (manifest, hash) pair — never an error.
+func (s *Service) runIntentHandshakeWith(ctx context.Context, sess *types.CallSession, gen intent.Generator) (*types.IntentManifest, string) {
+	if gen == nil {
+		gen = s.Intent
+	}
+	if gen == nil || sess == nil {
 		return nil, ""
 	}
 	in := intent.Input{
@@ -255,8 +270,18 @@ func (s *Service) runIntentHandshake(ctx context.Context, sess *types.CallSessio
 	if sess.RiskVerdict != nil && sess.RiskVerdict.Layer2.RiskScore != 0 {
 		in.RiskScore = sess.RiskVerdict.Layer2.RiskScore
 	}
-	m := s.Intent.Generate(ctx, in)
+	m := gen.Generate(ctx, in)
 	return &m, intent.Hash(m)
+}
+
+// runIntentHandshake executes Step 7 of the 9-step pipeline. Always
+// returns a usable (manifest, hash) pair — the manifest's Source field
+// distinguishes "live" (LLM call succeeded) from "fallback"
+// (deterministic per-scenario script). Never returns an error so a
+// caller can ignore failure modes; the demo never breaks on LLM
+// unavailability.
+func (s *Service) runIntentHandshake(ctx context.Context, sess *types.CallSession) (*types.IntentManifest, string) {
+	return s.runIntentHandshakeWith(ctx, sess, s.Intent)
 }
 
 // deriveIntentOutcome maps the terminal session state + block reason
@@ -549,7 +574,7 @@ func (s *Service) handleRunScenario(w http.ResponseWriter, r *http.Request) {
 	verResult := caller.Verify(s.DIDs, callerP, sess.ID, sess.Nonce, now)
 	if !verResult.OK {
 		final, _ := s.runRiskAndAnchor(sess, callerP, nil, callScript, string(verResult.Reason), now)
-		serveScenarioResult(w, r, s, final)
+		serveScenarioResult(w, r, s, final, s.intentForRequest(r))
 		return
 	}
 	// caller_proved
@@ -575,13 +600,13 @@ func (s *Service) handleRunScenario(w http.ResponseWriter, r *http.Request) {
 		server.WriteError(w, http.StatusInternalServerError, "orchestration_error", ferr.Error())
 		return
 	}
-	serveScenarioResult(w, r, s, final)
+	serveScenarioResult(w, r, s, final, s.intentForRequest(r))
 }
 
-func serveScenarioResult(w http.ResponseWriter, r *http.Request, s *Service, sess *types.CallSession) {
+func serveScenarioResult(w http.ResponseWriter, r *http.Request, s *Service, sess *types.CallSession, gen intent.Generator) {
 	// Step 7 of the 9-step pipeline — Intent Handshake. The Generate
 	// call always returns a Manifest (live or fallback); never errors.
-	manifest, manifestHash := s.runIntentHandshake(r.Context(), sess)
+	manifest, manifestHash := s.runIntentHandshakeWith(r.Context(), sess, gen)
 	// Persist the off-chain receipt hash too, so the SQLite audit
 	// trail records what the passport surfaced (best-effort).
 	if sess.Receipt != nil && manifestHash != "" {
